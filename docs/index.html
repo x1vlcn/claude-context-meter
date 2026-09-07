@@ -366,7 +366,13 @@ npm install &amp;&amp; npm run build</code></pre>
 
 <script src="app.js"></script>
 <!-- Vercel Web Analytics. Cookieless, aggregate-only, no cross-site tracking.
-     Served from the deployment's own origin, so no third-party request. -->
+     Served from the deployment's own origin, so no third-party request.
+     The queue shim is Vercel's documented snippet: it buffers anything fired
+     before the deferred script finishes loading, so an early page view is not
+     dropped. The /_vercel/insights route only exists on deployments created
+     AFTER Web Analytics is switched on for the project — enabling it does not
+     retrofit the running deployment, which has to be rebuilt. -->
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
 <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
