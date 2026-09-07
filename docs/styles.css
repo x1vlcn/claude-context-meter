@@ -1,263 +1,331 @@
 /* ─────────────────────────────────────────────────────────────────────────────
    claude-context-meter — documentation site
+   Built on the VulcanaX design system (vulcanax.com/assets/css).
 
-   Palette is the extension's own (src/config.js `brand`), including its accent
-   rule: ember carries every affordance, and RED IS RESTRICTED to danger states.
-   The site should look like the product it documents.
+   The system is a forge: one ember light source at the top right of the page,
+   decaying down-page. Surfaces warm toward the source and go cold away from it,
+   panel edges hold the light on their upper right, and the footer is the dying
+   coal. Tokens, the 88px grid texture, the divided-sheet construction and the
+   squared ember CTA are all carried over unchanged.
 
-   Type is one superfamily, IBM Plex. Mono for display and data because the whole
-   subject is counted text; sans for prose so the long sections stay readable.
+   Two of the system's rules shape this page in particular:
+
+     Red is IDENTITY ONLY — the wordmark flame. Ember carries every affordance.
+     So the accuracy comparison below is not red/green. The old tokenizer's
+     numbers are ash (--text-dim, cold, dead) and the exact ones are lit
+     (--ember). Heat is the semantic, which is the system's own vocabulary.
+
+     Body copy is a serif (Georgia). Labels, headings and data are the system
+     sans. No webfonts are loaded, matching the main site.
    ──────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  --ink:     #0A0A0B;
-  --panel:   #111113;
-  --well:    #18181B;
-  --line:    rgba(255, 255, 255, 0.09);
-  --line-2:  rgba(255, 255, 255, 0.16);
-  --cream:   #F5F5F7;
-  --muted:   #A1A1AA;
-  --dim:     #6B6B72;
-  --ember:   #FF7A2D;
-  --amber:   #F59E0B;
-  --green:   #4ADE80;
-  --red:     #E8232A;   /* danger only — never decorative */
+  --bg: #1E1B18; --bg-2: #272421; --bg-3: #302D2A;
+  --border: rgba(255,255,255,.10); --border-2: rgba(255,255,255,.16);
+  --text-primary: #F5F5F7; --text-muted: #A1A1AA; --text-dim: #78787E;
+  --cream-dim: #C9C1B4;
+  --red: #E8232A; --ember: #FF7A2D;
+  --heat-edge: rgba(255,138,64,.32); --heat-edge-dim: rgba(255,138,64,.14);
+  --forge-fill: radial-gradient(125% 150% at 50% 125%, #FF7A2D 0%, #E8232A 55%, #B81A20 100%);
+  --field: radial-gradient(640px 420px at 100% -90px, rgba(255,122,45,.10) 0%, rgba(232,35,42,.05) 45%, rgba(232,35,42,0) 72%);
+  --grid-line: rgba(242,237,226,.06); --grid-cell: rgba(242,237,226,.045);
+  --font-label: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body: Georgia, "Times New Roman", Times, serif;
+  /* The system defines no mono. Token pieces and code need one, and a system
+     stack keeps this page webfont-free like the rest of the site. */
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
-  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-
-  --gut: clamp(20px, 5vw, 64px);
-  --maxw: 1120px;
+  --gut: clamp(20px, 5vw, 56px);
+  --maxw: 1080px;
 }
 
-* { box-sizing: border-box; }
+:root, [data-theme="dark"] { color-scheme: dark; }
 
-html { scroll-behavior: smooth; }
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation: none !important; transition: none !important; }
+[data-theme="light"] {
+  --bg: #F2EDE2; --bg-2: #E9E2D2; --bg-3: #DFD6C2;
+  --border: rgba(26,22,20,0.14); --border-2: rgba(26,22,20,0.22);
+  --text-primary: #1A1614; --text-muted: #544C44; --text-dim: #7A726A;
+  --cream-dim: #6E665F;
+  --red: #C81E25; --ember: #C8590F;
+  --heat-edge: rgba(200,89,15,.30); --heat-edge-dim: rgba(200,89,15,.13);
+  --forge-fill: radial-gradient(125% 150% at 50% 125%, #C8590F 0%, #C81E25 55%, #9A1218 100%);
+  --field: radial-gradient(640px 420px at 100% -90px, rgba(200,89,15,.08) 0%, rgba(200,30,37,.04) 45%, rgba(200,30,37,0) 72%);
+  --grid-line: rgba(26,22,20,.07); --grid-cell: rgba(26,22,20,.05);
+  color-scheme: light;
 }
+@media (prefers-color-scheme: light) {
+  [data-theme="system"] {
+    --bg: #F2EDE2; --bg-2: #E9E2D2; --bg-3: #DFD6C2;
+    --border: rgba(26,22,20,0.14); --border-2: rgba(26,22,20,0.22);
+    --text-primary: #1A1614; --text-muted: #544C44; --text-dim: #7A726A;
+    --cream-dim: #6E665F;
+    --red: #C81E25; --ember: #C8590F;
+    --heat-edge: rgba(200,89,15,.30); --heat-edge-dim: rgba(200,89,15,.13);
+    --forge-fill: radial-gradient(125% 150% at 50% 125%, #C8590F 0%, #C81E25 55%, #9A1218 100%);
+    --field: radial-gradient(640px 420px at 100% -90px, rgba(200,89,15,.08) 0%, rgba(200,30,37,.04) 45%, rgba(200,30,37,0) 72%);
+    --grid-line: rgba(26,22,20,.07); --grid-cell: rgba(26,22,20,.05);
+    color-scheme: light;
+  }
+}
+[data-theme="system"] { color-scheme: light dark; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  margin: 0;
-  background: var(--ink);
-  color: var(--cream);
-  font-family: var(--sans);
-  font-size: 16px;
-  line-height: 1.65;
+  min-height: 100vh;
+  background-color: var(--bg);
+  background-image: var(--field);
+  background-repeat: no-repeat;
+  font-family: var(--font-label);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
 }
+
+/* Grid texture: fixed layer under the content, masked so it decays away from the
+   light source exactly as it does on the main site. */
+.vx-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    repeating-linear-gradient(to right, var(--grid-line) 0 1px, transparent 1px 88px),
+    repeating-linear-gradient(to bottom, var(--grid-line) 0 1px, transparent 1px 88px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.45) 46%, transparent 88%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.45) 46%, transparent 88%);
+}
+/* Two cells still lit, on the 88px module, near the source. */
+.vx-grid i { position: absolute; display: block; background: var(--grid-cell); }
+.vx-grid i:nth-child(1) { top: 88px; right: 176px; width: 176px; height: 88px; }
+.vx-grid i:nth-child(2) { top: 264px; right: 88px;  width: 88px;  height: 88px; opacity: .7; }
+
+.wrap { position: relative; z-index: 1; max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gut); }
 
 a { color: var(--ember); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 3px; }
-:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; border-radius: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--ember); outline-offset: 3px; }
 
-.wrap { max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gut); }
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.vx-nav {
+  position: relative; z-index: 2;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  backdrop-filter: blur(10px);
+  position: sticky; top: 0;
+}
+.vx-nav-in {
+  display: flex; align-items: center; gap: 20px; height: 58px;
+  max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gut);
+}
+.vx-mark { display: flex; align-items: center; gap: 11px; color: var(--text-primary); }
+.vx-mark:hover { text-decoration: none; }
+.vx-mark svg { display: block; height: 21px; width: auto; }
+.vx-mark path[fill="#E8232A"] { fill: var(--red); }
+.vx-mark b {
+  font-weight: 600; font-size: 13px; letter-spacing: .01em; color: var(--text-primary);
+  border-left: 1px solid var(--border-2); padding-left: 11px;
+}
+.vx-nav-links { margin-left: auto; display: flex; gap: 18px; align-items: center; }
+.vx-nav-links a {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--text-muted);
+}
+.vx-nav-links a:hover { color: var(--ember); text-decoration: none; }
+.theme-toggle-btn {
+  background: none; border: 1px solid var(--border); color: var(--text-muted);
+  font: inherit; font-size: 10.5px; font-weight: 700; letter-spacing: .13em;
+  text-transform: uppercase; padding: 5px 9px; cursor: pointer;
+}
+.theme-toggle-btn:hover { color: var(--ember); border-color: var(--heat-edge); }
+@media (max-width: 760px) { .vx-hide { display: none; } }
 
-/* ── Nav ─────────────────────────────────────────────────────────────────── */
-.nav {
-  position: sticky; top: 0; z-index: 40;
-  background: color-mix(in srgb, var(--ink) 88%, transparent);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--line);
-}
-.nav-in {
-  display: flex; align-items: center; gap: 22px;
-  height: 56px; max-width: var(--maxw); margin: 0 auto; padding-inline: var(--gut);
-}
-.brand {
-  font-family: var(--mono); font-weight: 600; font-size: 13px;
-  letter-spacing: -0.01em; color: var(--cream); display: flex; align-items: center; gap: 9px;
-}
-.brand:hover { text-decoration: none; }
-.brand svg { width: 17px; height: 17px; display: block; }
-.nav-links { margin-left: auto; display: flex; gap: 20px; align-items: center; }
-.nav-links a {
-  font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 0.01em;
-}
-.nav-links a:hover { color: var(--cream); text-decoration: none; }
-@media (max-width: 720px) { .nav-hide { display: none; } }
+/* ── Sections ────────────────────────────────────────────────────────────── */
+.sec { padding-block: clamp(52px, 8vw, 92px); }
+.sec + .sec { border-top: 1px solid var(--border); }
 
-/* ── Section scaffolding ─────────────────────────────────────────────────── */
-.sec { padding-block: clamp(56px, 9vw, 104px); border-top: 1px solid var(--line); }
-.sec:first-of-type { border-top: none; }
-
-/* The eyebrow carries a real measured value from the project rather than an
-   ordinal. The structure encodes evidence — that is the whole argument here. */
+/* The eyebrow carries a measured value from the project rather than an ordinal:
+   the structure encodes evidence, which is what this page is arguing. */
 .eyebrow {
-  font-family: var(--mono); font-size: 11px; font-weight: 500;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--ember); margin-bottom: 14px;
-  display: flex; align-items: baseline; gap: 10px;
-}
-.eyebrow::after {
-  content: ""; flex: 1; height: 1px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--ember) 40%, transparent), transparent);
+  font-weight: 700; font-size: 11px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--ember); margin-bottom: 15px;
 }
 
-h1, h2, h3 { font-family: var(--mono); font-weight: 600; letter-spacing: -0.02em; margin: 0; }
-h1 { font-size: clamp(30px, 5.2vw, 54px); line-height: 1.1; }
-h2 { font-size: clamp(23px, 3vw, 32px); line-height: 1.2; margin-bottom: 14px; }
-h3 { font-size: 16px; line-height: 1.35; margin-bottom: 7px; }
+h1, h2 { font-weight: 700; letter-spacing: -0.015em; line-height: 1.12; }
+h1 { font-size: clamp(30px, 5.4vw, 52px); max-width: 18ch; }
+h2 { font-size: clamp(24px, 3.2vw, 34px); margin-bottom: 16px; }
+h3 { font-size: 16px; font-weight: 600; line-height: 1.35; margin-bottom: 6px; }
 
-p { margin: 0 0 16px; max-width: 68ch; color: var(--muted); }
-p strong { color: var(--cream); font-weight: 500; }
-.lede { font-size: clamp(17px, 2vw, 19px); color: var(--cream); max-width: 60ch; }
+p { font-family: var(--font-body); font-size: 16.5px; line-height: 1.62;
+    color: var(--cream-dim); max-width: 64ch; margin-bottom: 15px; }
+p:last-child { margin-bottom: 0; }
+p strong { color: var(--text-primary); font-weight: 700; }
+.lede { font-size: 18.5px; color: var(--text-primary); max-width: 56ch; }
 
 /* ── Hero ────────────────────────────────────────────────────────────────── */
-.hero { padding-top: clamp(46px, 8vw, 84px); padding-bottom: clamp(40px, 6vw, 68px); }
-.hero h1 { max-width: 19ch; }
+.hero { padding-top: clamp(44px, 7vw, 76px); padding-bottom: clamp(36px, 5vw, 60px); }
 .hero h1 em { font-style: normal; color: var(--ember); }
-.hero .lede { margin-top: 20px; }
+.hero .lede { margin-top: 19px; }
 
+/* The system's primary action: solid ember, page-dark label, squared, forge-fill
+   on press. Never rounded — the whole system is milled, not soft. */
 .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
 .btn {
-  font-family: var(--mono); font-size: 13px; font-weight: 500;
-  padding: 11px 20px; border-radius: 7px; border: 1px solid var(--line-2);
-  color: var(--cream); background: transparent; cursor: pointer;
-  display: inline-flex; align-items: center; gap: 8px;
-  transition: border-color .16s, background .16s, color .16s;
+  position: relative; overflow: hidden; display: inline-flex; align-items: center;
+  border: 1px solid var(--border-2); background: none; color: var(--text-primary);
+  padding: 13px 22px; font: inherit; font-weight: 700; font-size: 12px;
+  letter-spacing: .11em; text-transform: uppercase; cursor: pointer;
+  transition: border-color .2s ease, color .2s ease;
 }
-.btn:hover { text-decoration: none; border-color: var(--ember); color: var(--ember); }
-.btn-primary {
-  background: color-mix(in srgb, var(--ember) 15%, transparent);
-  border-color: color-mix(in srgb, var(--ember) 45%, transparent);
-  color: var(--ember);
+.btn:hover { text-decoration: none; border-color: var(--heat-edge); color: var(--ember); }
+.btn-primary { border: 0; background: var(--ember); color: var(--bg); }
+.btn-primary:hover { background: var(--forge-fill); color: var(--bg); }
+
+/* ── Sheet: the system's divided-panel construction ──────────────────────── */
+/* 1px gaps over a hairline ground, so rows read as one milled panel rather than
+   floating cards. The edge warms toward the light at its upper right. */
+.sheet {
+  display: grid; gap: 1px; background: var(--border);
+  border: 1px solid var(--border);
+  border-image: linear-gradient(to bottom left, var(--heat-edge), var(--heat-edge-dim) 26%, rgba(255,255,255,.10) 52%, rgba(255,255,255,.07)) 1;
 }
-.btn-primary:hover { background: color-mix(in srgb, var(--ember) 26%, transparent); }
+[data-theme="light"] .sheet { border-image: linear-gradient(to bottom left, var(--heat-edge), var(--heat-edge-dim) 26%, rgba(26,22,20,.14) 52%, rgba(26,22,20,.10)) 1; }
+@media (prefers-color-scheme: light) {
+  [data-theme="system"] .sheet { border-image: linear-gradient(to bottom left, var(--heat-edge), var(--heat-edge-dim) 26%, rgba(26,22,20,.14) 52%, rgba(26,22,20,.10)) 1; }
+}
 
 /* ── Signature: the token tiling comparison ──────────────────────────────── */
-/* The argument of the whole page, made visible. Same sentence, two tokenizers,
-   real tilings from both. The Claude row is simply longer — that is the bug the
-   old approach had, drawn rather than asserted. */
-.tiles { margin-top: clamp(38px, 6vw, 60px); }
+/* The argument of the page, drawn rather than asserted: the same sentence, both
+   tokenizers' real output. The old row is ash; the Claude row is lit. */
+.tiles { margin-top: clamp(34px, 5vw, 54px); }
 .tiles-cap {
-  font-family: var(--mono); font-size: 12px; color: var(--dim);
-  margin-bottom: 16px; display: flex; gap: 9px; align-items: baseline; flex-wrap: wrap;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 14px;
 }
-.tiles-cap b { color: var(--muted); font-weight: 500; }
+.tiles-cap span { color: var(--text-dim); letter-spacing: .1em; }
 
-.strip { border: 1px solid var(--line); border-radius: 11px; overflow: hidden; background: var(--panel); }
-.row { display: grid; grid-template-columns: 132px 1fr auto; gap: 16px; align-items: center;
-       padding: 15px 18px; }
-.row + .row { border-top: 1px solid var(--line); }
-.row-label {
-  font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em;
-  text-transform: uppercase; color: var(--dim); line-height: 1.35;
+.trow { display: grid; grid-template-columns: 148px minmax(0,1fr) auto; gap: 18px;
+        align-items: center; padding: 16px 18px; background: var(--bg-2); }
+.trow-label { line-height: 1.3; }
+.trow-label b { display: block; font-size: 13.5px; font-weight: 700; letter-spacing: -0.01em; }
+.trow-label i {
+  font-style: normal; display: block; margin-top: 3px;
+  font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted);
 }
-.row-label b { display: block; font-weight: 600; letter-spacing: 0.02em; text-transform: none; font-size: 12.5px; }
-.row.is-old .row-label b { color: var(--amber); }
-.row.is-new .row-label b { color: var(--green); }
+.is-cold .trow-label b { color: var(--cream-dim); }
+.is-hot  .trow-label b { color: var(--ember); }
+.is-hot  { box-shadow: inset 2px 0 0 var(--ember); }
 
 .pieces { display: flex; flex-wrap: wrap; gap: 3px; }
 .pc {
-  font-family: var(--mono); font-size: 13px; line-height: 1;
-  padding: 6px 5px; border-radius: 4px; white-space: pre;
-  border: 1px solid transparent;
-  animation: pop .32s cubic-bezier(.2,.7,.3,1) both;
+  font-family: var(--font-mono); font-size: 12.5px; line-height: 1;
+  padding: 6px 5px; white-space: pre; border: 1px solid var(--border);
+  background: var(--bg-3); color: var(--text-muted);
+  animation: pop .3s cubic-bezier(.2,.7,.3,1) both;
 }
-.is-old .pc { background: color-mix(in srgb, var(--amber) 13%, transparent);
-              border-color: color-mix(in srgb, var(--amber) 26%, transparent); color: #FFD9A0; }
-.is-new .pc { background: color-mix(in srgb, var(--green) 11%, transparent);
-              border-color: color-mix(in srgb, var(--green) 24%, transparent); color: #BBF3D0; }
-/* The structural markers are real output, not ornament: they are why the count
-   is higher. Dimmed so the readable text still reads first. */
-.mk { opacity: .42; font-size: 11px; }
+.is-hot .pc {
+  border-color: var(--heat-edge-dim); color: var(--text-primary);
+  background: color-mix(in srgb, var(--ember) 9%, var(--bg-3));
+}
+/* Markers are real output, not ornament — they are why the count is higher. */
+.mk { opacity: .45; font-size: 10.5px; }
 
-.tally { font-family: var(--mono); text-align: right; line-height: 1.15; }
-.tally b { display: block; font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
-.tally span { font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: var(--dim); }
-.is-old .tally b { color: var(--amber); }
-.is-new .tally b { color: var(--green); }
+.tally { text-align: right; line-height: 1.1; }
+.tally b { display: block; font-size: 27px; font-weight: 700; letter-spacing: -0.02em; }
+.tally i { font-style: normal; font-size: 9.5px; letter-spacing: .14em;
+           text-transform: uppercase; color: var(--text-dim); }
+.is-cold .tally b { color: var(--text-dim); }
+.is-hot  .tally b { color: var(--ember); }
 
 @keyframes pop { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .pc { animation: none; } }
 
-.strip-foot {
-  font-family: var(--mono); font-size: 11.5px; color: var(--dim);
-  padding: 12px 18px; border-top: 1px solid var(--line); background: var(--ink);
-  line-height: 1.6;
+.tiles-foot {
+  padding: 13px 18px; background: var(--bg);
+  font-family: var(--font-body); font-size: 14.5px; line-height: 1.6; color: var(--text-muted);
 }
-.strip-foot b { color: var(--amber); font-weight: 500; }
+.tiles-foot b { color: var(--ember); font-weight: 700; }
 
-@media (max-width: 760px) {
-  .row { grid-template-columns: 1fr auto; }
-  .row-label { grid-column: 1 / -1; }
+@media (max-width: 780px) {
+  .trow { grid-template-columns: minmax(0,1fr) auto; }
+  .trow-label { grid-column: 1 / -1; }
 }
 
-/* ── Data table ──────────────────────────────────────────────────────────── */
-.tbl-scroll { overflow-x: auto; margin-top: 26px; border: 1px solid var(--line); border-radius: 11px; }
-table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 620px; }
+/* ── Table ───────────────────────────────────────────────────────────────── */
+.tbl-scroll { overflow-x: auto; margin-top: 26px; border: 1px solid var(--border);
+              border-image: linear-gradient(to bottom left, var(--heat-edge), var(--heat-edge-dim) 26%, rgba(255,255,255,.10) 52%, rgba(255,255,255,.07)) 1; }
+table { border-collapse: collapse; width: 100%; min-width: 640px; background: var(--bg-2); }
 thead th {
-  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.09em; text-transform: uppercase;
-  color: var(--dim); font-weight: 500; text-align: right; padding: 13px 16px;
-  background: var(--panel); border-bottom: 1px solid var(--line); white-space: nowrap;
+  font-size: 10px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--text-muted); text-align: right; padding: 14px 16px;
+  background: var(--bg-3); border-bottom: 1px solid var(--border); white-space: nowrap;
 }
 thead th:first-child { text-align: left; }
-tbody td { padding: 13px 16px; text-align: right; font-family: var(--mono); font-size: 13.5px;
-           border-bottom: 1px solid var(--line); color: var(--muted); }
-tbody td:first-child { text-align: left; font-family: var(--sans); color: var(--cream); }
+tbody td { padding: 14px 16px; text-align: right; font-family: var(--font-mono);
+           font-size: 13.5px; border-bottom: 1px solid var(--border); color: var(--text-dim); }
+tbody td:first-child { text-align: left; font-family: var(--font-label); font-size: 14.5px;
+                       font-weight: 600; color: var(--text-primary); }
 tbody tr:last-child td { border-bottom: none; }
-.bad  { color: var(--amber); }
-.good { color: var(--green); }
+/* Ash for the old tokenizer's numbers, lit for the exact ones. */
+.ash { color: var(--text-dim); }
+.lit { color: var(--ember); font-weight: 600; }
 
-/* ── Feature grid ────────────────────────────────────────────────────────── */
-.grid { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line);
-        border-radius: 11px; overflow: hidden; margin-top: 26px;
-        grid-template-columns: repeat(auto-fit, minmax(268px, 1fr)); }
-.card { background: var(--panel); padding: 24px 22px; }
-.card p { font-size: 14.5px; margin-bottom: 0; }
-.card .tag {
-  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--ember); display: block; margin-bottom: 9px;
-}
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+.cards { margin-top: 26px; grid-template-columns: repeat(auto-fit, minmax(266px, 1fr)); }
+.card { background: var(--bg-2); padding: 24px 22px; transition: background .18s ease, box-shadow .18s ease; }
+.card:hover { background: var(--bg-3); box-shadow: inset 2px 0 0 var(--ember); }
+.card .tag { display: block; font-size: 10px; font-weight: 700; letter-spacing: .14em;
+             text-transform: uppercase; color: var(--ember); margin-bottom: 9px; }
+.card p { font-size: 15px; margin-bottom: 0; }
 
 /* ── Steps ───────────────────────────────────────────────────────────────── */
-/* Numbered because installing genuinely is a sequence — the order carries
-   information the reader needs. */
-.steps { counter-reset: s; margin-top: 26px; padding: 0; list-style: none; }
-.steps li { counter-increment: s; position: relative; padding-left: 42px; margin-bottom: 22px; }
+/* Numbered because installing genuinely is a sequence. */
+.steps { counter-reset: s; margin-top: 26px; list-style: none; }
+.steps li { counter-increment: s; position: relative; padding-left: 44px; margin-bottom: 24px; }
+.steps li:last-child { margin-bottom: 0; }
 .steps li::before {
-  content: counter(s, decimal-leading-zero);
-  position: absolute; left: 0; top: 1px;
-  font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--ember);
-  border: 1px solid color-mix(in srgb, var(--ember) 32%, transparent);
-  border-radius: 5px; width: 27px; height: 27px; display: grid; place-items: center;
+  content: counter(s, decimal-leading-zero); position: absolute; left: 0; top: 0;
+  font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--ember);
+  border: 1px solid var(--heat-edge-dim); width: 28px; height: 28px;
+  display: grid; place-items: center;
 }
-.steps p { margin-bottom: 0; }
 
-pre {
-  font-family: var(--mono); font-size: 13px; background: var(--well);
-  border: 1px solid var(--line); border-radius: 8px; padding: 13px 15px;
-  overflow-x: auto; margin: 10px 0 0; color: var(--cream);
-}
-code { font-family: var(--mono); font-size: 0.92em; color: var(--ember);
-       background: color-mix(in srgb, var(--ember) 10%, transparent);
-       padding: 1px 5px; border-radius: 4px; }
-pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+pre { font-family: var(--font-mono); font-size: 12.5px; background: var(--bg-2);
+      border: 1px solid var(--border); padding: 13px 15px; overflow-x: auto;
+      margin-top: 11px; color: var(--text-primary); line-height: 1.55; }
+code { font-family: var(--font-mono); font-size: 0.9em; color: var(--ember); }
+pre code { color: inherit; font-size: inherit; }
 
-/* ── Ladder (token source priority) ──────────────────────────────────────── */
-.ladder { margin-top: 26px; border: 1px solid var(--line); border-radius: 11px; overflow: hidden; }
-.rung { display: grid; grid-template-columns: 104px 1fr; gap: 18px; padding: 15px 18px;
-        background: var(--panel); align-items: start; }
-.rung + .rung { border-top: 1px solid var(--line); }
-.rung-k { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; }
-.rung-k i { font-style: normal; display: block; font-size: 9.5px; color: var(--dim);
-            letter-spacing: 0.09em; text-transform: uppercase; margin-top: 3px; }
-.rung p { margin: 0; font-size: 14px; }
-.k-measured { color: var(--green); }
-.k-exact    { color: var(--ember); }
-.k-approx   { color: var(--muted); }
+/* ── Ladder ──────────────────────────────────────────────────────────────── */
+.rung { display: grid; grid-template-columns: 118px minmax(0,1fr); gap: 18px;
+        padding: 16px 18px; background: var(--bg-2); align-items: start; }
+.rung-k { font-size: 12px; font-weight: 700; letter-spacing: .05em; }
+.rung-k i { font-style: normal; display: block; font-size: 9.5px; color: var(--text-dim);
+            letter-spacing: .12em; text-transform: uppercase; margin-top: 4px; font-weight: 400; }
+.rung p { margin: 0; font-size: 14.5px; }
+.k-hot  { color: var(--ember); }
+.k-warm { color: var(--cream-dim); }
+.k-cold { color: var(--text-dim); }
 @media (max-width: 620px) { .rung { grid-template-columns: 1fr; gap: 6px; } }
 
 /* ── Caveats ─────────────────────────────────────────────────────────────── */
-.caveat { border-left: 2px solid var(--line-2); padding-left: 18px; margin-top: 22px; }
-.caveat h3 { color: var(--cream); }
-.caveat p { margin-bottom: 0; font-size: 14.5px; }
+/* Low in the decay: a cold rule, no lift. */
+.caveat { border-left: 1px solid var(--border-2); padding-left: 20px; margin-top: 24px; }
+.caveat p { margin-bottom: 0; font-size: 15px; }
 
-/* ── Footer ──────────────────────────────────────────────────────────────── */
-.foot { border-top: 1px solid var(--line); padding-block: 40px 56px; }
-.foot-in { display: flex; flex-wrap: wrap; gap: 22px 40px; justify-content: space-between; }
-.foot p { font-size: 13px; margin: 0; max-width: 46ch; }
-.foot-links { display: flex; flex-direction: column; gap: 7px; }
-.foot-links a { font-family: var(--mono); font-size: 12.5px; }
+/* ── Footer: the dying coal ──────────────────────────────────────────────── */
+.foot { position: relative; z-index: 1; margin-top: 8px; padding-block: 34px 48px;
+        border-top: 1px solid var(--border);
+        border-image: linear-gradient(to left, var(--heat-edge-dim), var(--border) 45%) 1; }
+.foot-in { display: flex; flex-wrap: wrap; gap: 26px 44px; justify-content: space-between; align-items: flex-start; }
+.foot p { font-size: 14px; max-width: 48ch; margin: 0; }
+.foot-links { display: flex; flex-direction: column; gap: 8px; }
+.foot-links a { font-size: 10.5px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+.coals { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; width: 72px; flex-shrink: 0; }
+.coals span { display: block; width: 100%; aspect-ratio: 1; background: var(--ember); opacity: .15; }
+.coals span:nth-child(9n+2)  { opacity: .26; }
+.coals span:nth-child(13n+7) { opacity: .18; }
+.coals span:nth-child(7n+5)  { opacity: .08; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+html { scroll-behavior: smooth; }

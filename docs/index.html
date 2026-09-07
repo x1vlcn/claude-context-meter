@@ -5,35 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Claude Context Meter — exact context tracking for claude.ai</title>
 <meta name="description" content="A browser extension that shows how full your Claude conversation is, counted with a port of Claude's own tokenizer. Verified exact on 5,278 reference documents.">
-<meta name="color-scheme" content="dark">
 
 <meta property="og:title" content="Claude Context Meter">
 <meta property="og:description" content="Exact context tracking for claude.ai, counted with Claude's own tokenizer.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://x1vlcn.github.io/claude-context-meter/">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230A0A0B'/%3E%3Cpath d='M6 17 L12 7 L18 17' stroke='%23F5F5F7' stroke-width='2.2' fill='none'/%3E%3Cpath d='M8.5 13.5 h7' stroke='%23FF7A2D' stroke-width='2.2'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%231E1B18'/%3E%3Cpath d='M5 18 L12 6 L19 18' stroke='%23F5F5F7' stroke-width='2.2' fill='none'/%3E%3Cpath d='M8 13.5 h8' stroke='%23FF7A2D' stroke-width='2.2'/%3E%3C/svg%3E">
+<!-- Runs before paint so <html data-theme> is stamped and the page never flashes
+     the wrong theme. Same controller as vulcanax.com. -->
+<script src="theme.js"></script>
 </head>
 <body>
 
-<nav class="nav">
-  <div class="nav-in">
-    <a class="brand" href="#top">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M4 18 L12 5 L20 18" stroke="#F5F5F7" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-        <path d="M7.5 13 h9" stroke="#FF7A2D" stroke-width="2.2" stroke-linecap="round"/>
+<!-- The page field's grid texture, with two cells still lit near the source. -->
+<div class="vx-grid" aria-hidden="true"><i></i><i></i></div>
+
+<nav class="vx-nav">
+  <div class="vx-nav-in">
+    <a class="vx-mark" href="#top" aria-label="VulcanaX — Claude Context Meter">
+      <svg viewBox="267.1 723.5 1523.8 602.0" role="img" aria-label="VulcanaX" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#E8232A" d="m 926.949,751.968 123.691,0.027 c 19.34,-0.017 61.14,-1.313 77.9,2.583 29.93,7.222 57.24,22.652 78.88,44.554 37.66,38.11 52.98,92.386 87.45,133.043 45.81,54.043 111.15,81.245 180.23,90.075 l -1.98,2.76 -154.77,0.74 c -38.06,0.13 -87.91,2.95 -123.73,-5.02 -58.46,-13 -99.15,-64.908 -125.23,-115.161 -14.19,-27.321 -33.26,-55.145 -50.19,-80.628 -23.621,-35.542 -53.316,-57.573 -94.048,-70.424 z"/>
+        <path fill="#E8232A" d="m 1305.61,1055.03 110.45,-0.32 c 23.99,-0.05 52.98,-1.31 76.24,2.74 16.9,2.93 35.33,11.6 50.02,20.24 66.57,39.18 81.34,113.16 131.59,166.12 23.1,24.34 46.93,37.98 78.48,49.35 3.12,0.17 4.81,0.97 7.87,1.93 l 2.6,0.28 -0.36,1 c -33.8,1.74 -68.37,0.26 -102.25,0.8 -7.04,0.11 -14.24,0.03 -21.28,-0.33 -20.68,0.12 -56.35,1.35 -75.78,-0.73 -47.68,-5.11 -90.57,-40.88 -114.1,-81.35 -12.65,-21.75 -25.55,-49.79 -40.64,-69.29 -27.15,-35.08 -67.87,-62.92 -102.84,-90.44 z"/>
+        <path fill="#E8232A" d="m 1346.71,953.445 c 81.73,-41.783 73.52,-95.96 132.06,-155.985 18.96,-18.91 46.08,-36.354 72.61,-42.12 24.76,-5.382 56.98,-3.461 82.78,-3.454 l 111.78,0.069 c 4.34,0 8.5,0.059 12.85,-0.209 l 0.21,1.637 c -2.01,0.401 -4.81,1.049 -6.79,1.192 -74.76,23.679 -99.46,76.115 -135.91,139.384 -65.08,112.951 -161.28,125.761 -269.59,59.486 z"/>
+        <path fill="#E8232A" d="m 1202.63,1054.49 c 14,-0.24 31.69,-1.57 45.05,2.42 33.87,10.12 70.05,30.94 94.4,56.74 -5.62,3.52 -20.28,9.95 -27.17,13.83 -31.93,17.97 -39.79,37.54 -56.74,67.19 -4.91,7.72 -10.76,17.55 -16.55,24.4 -9.83,-12.62 -25.3,-38.05 -33.67,-52.05 -22.48,-37.56 -45.09,-74.98 -67.68,-112.45 z"/>
+        <path fill="currentColor" d="m 588.062,752.024 174.685,-0.224 53.755,-0.068 c 15.715,-0.019 33.928,-0.837 49.066,2.517 29.789,6.613 57.14,21.415 78.97,42.737 26.348,25.845 54.579,85.142 74.202,117.77 11.78,19.605 24.21,39.292 36.23,58.777 l 98.24,155.967 c 24.07,37.98 50.87,86.82 80.17,120.02 17.38,19.7 55.92,38.83 82.47,42.78 -0.29,1.21 -0.4,1.43 -0.88,2.59 l -134.69,2.16 c -25.49,0.18 -47.54,1.94 -72.8,-2.48 -79.23,-13.85 -116.137,-82.84 -152.8,-146.01 -7.424,-12.8 -15.182,-25.65 -22.731,-38.43 C 895.564,1048.74 858.527,987.738 820.841,927.138 809.629,909.192 799.285,889.326 787.597,872.141 741.881,804.922 664.519,770.14 587.063,755.158 Z"/>
+        <path fill="currentColor" d="m 658.365,806.641 c 63.303,16.54 97.744,57.463 129.107,110.978 l 5.833,10.046 -118.488,190.955 c -25.096,40.26 -57.043,98.09 -89.185,129.38 -23.136,22.52 -52.064,38.19 -83.569,45.26 -25.734,5.72 -56.686,3.14 -83.207,3.42 -40.264,0.43 -81.879,-1.64 -121.951,-1.64 l -1.835,-2.49 c 37.633,-9.76 65.774,-28.12 92.356,-56.66 18.456,-19.83 31.873,-44.87 46.058,-67.99 l 40.955,-65.61 103.264,-165.708 c 25.361,-41.178 53.984,-90.269 80.662,-129.941 z"/>
+        <path fill="currentColor" d="m 847.981,1054.45 c 5.645,-0.36 12.752,-0.29 18.519,-0.4 4.667,9.38 17.211,28.66 23.014,38.28 l 42.299,70.09 c 9.146,15 19.995,31.79 28.265,47.1 -19.676,1.2 -47.178,0.36 -67.61,0.38 l -125.968,0.11 -113.012,-0.08 c 47.809,-80.61 89.131,-152.05 194.493,-155.48 z"/>
       </svg>
-      claude-context-meter
+      <b>Context Meter</b>
     </a>
-    <div class="nav-links">
-      <a href="#evidence" class="nav-hide">Accuracy</a>
-      <a href="#shows" class="nav-hide">What it shows</a>
+    <div class="vx-nav-links">
+      <a href="#evidence" class="vx-hide">Accuracy</a>
+      <a href="#shows" class="vx-hide">What it shows</a>
       <a href="#install">Install</a>
-      <a href="#how" class="nav-hide">How it works</a>
-      <a href="https://github.com/x1vlcn/claude-context-meter">GitHub&nbsp;↗</a>
+      <a href="#how" class="vx-hide">How it works</a>
+      <a href="https://github.com/x1vlcn/claude-context-meter">GitHub</a>
+      <button class="theme-toggle-btn" data-theme-set="light" aria-pressed="false">Light</button>
+      <button class="theme-toggle-btn" data-theme-set="dark" aria-pressed="true">Dark</button>
     </div>
   </div>
 </nav>
@@ -41,7 +51,7 @@
 <main id="top">
 
 <!-- ── Hero ──────────────────────────────────────────────────────────────── -->
-<section class="wrap hero">
+<section class="wrap sec hero">
   <h1>Claude won't tell you how full the conversation is. <em>This does.</em></h1>
   <p class="lede">
     A browser extension that meters your context window on claude.ai — counted with a
@@ -53,28 +63,25 @@
     <a class="btn" href="https://github.com/x1vlcn/claude-context-meter">Source on GitHub</a>
   </div>
 
-  <!-- Signature: the same sentence, tiled by both tokenizers, real output. -->
+  <!-- Signature: one sentence, both tokenizers, real output. -->
   <div class="tiles">
-    <div class="tiles-cap">
-      <b>One sentence, two tokenizers.</b>
-      <span>Actual tilings — not an illustration.</span>
-    </div>
+    <div class="tiles-cap">One sentence, two tokenizers. <span>Actual tilings, not an illustration.</span></div>
 
-    <div class="strip">
-      <div class="row is-old">
-        <div class="row-label"><b>o200k_base</b>what most tools count with</div>
+    <div class="sheet">
+      <div class="trow is-cold">
+        <div class="trow-label"><b>o200k_base</b><i>What most tools count with</i></div>
         <div class="pieces" id="row-old"></div>
-        <div class="tally"><b>11</b><span>pieces</span></div>
+        <div class="tally"><b>11</b><i>pieces</i></div>
       </div>
-      <div class="row is-new">
-        <div class="row-label"><b>Claude</b>what you're actually billed</div>
+      <div class="trow is-hot">
+        <div class="trow-label"><b>Claude</b><i>What you're actually billed</i></div>
         <div class="pieces" id="row-new"></div>
-        <div class="tally"><b>17</b><span>pieces</span></div>
+        <div class="tally"><b>17</b><i>pieces</i></div>
       </div>
-      <div class="strip-foot">
-        Claude splits the same 43 characters into <b>55% more pieces</b>, and marks word
-        edges (<code>bow</code>/<code>eow</code>) and capitalisation (<code>shift</code>)
-        as tokens of their own. Count with the wrong tokenizer and you are told you have
+      <div class="tiles-foot">
+        Claude cuts the same 43 characters into <b>55% more pieces</b>, and spends tokens
+        marking word edges (<code>bow</code>/<code>eow</code>) and capitalisation
+        (<code>shift</code>). Count with the wrong tokenizer and you are told you have
         room you do not have.
       </div>
     </div>
@@ -105,33 +112,33 @@
       <tbody>
         <tr>
           <td>Opus 5 · Sonnet 5</td>
-          <td class="bad">−31.5%</td><td class="bad">32.7%</td><td class="bad">0.0%</td>
-          <td class="good">100% exact</td>
+          <td class="ash">−31.5%</td><td class="ash">32.7%</td><td class="ash">0.0%</td>
+          <td class="lit">100% exact</td>
         </tr>
         <tr>
           <td>Opus 4.8 · Opus 4.7</td>
-          <td class="bad">−10.6%</td><td class="bad">13.4%</td><td class="bad">21.6%</td>
-          <td class="good">100% exact</td>
+          <td class="ash">−10.6%</td><td class="ash">13.4%</td><td class="ash">21.6%</td>
+          <td class="lit">100% exact</td>
         </tr>
         <tr>
           <td>Sonnet 4.6 · Opus 4.6 · Haiku 4.5</td>
-          <td class="bad">−18.9%</td><td class="bad">20.1%</td><td class="bad">0.8%</td>
-          <td class="good">100% exact</td>
+          <td class="ash">−18.9%</td><td class="ash">20.1%</td><td class="ash">0.8%</td>
+          <td class="lit">100% exact</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <p style="margin-top:22px">
+  <p style="margin-top:24px">
     Every error ran the same direction: the old approach <strong>under-counted</strong>, so it
     reported more headroom than existed. On Opus 5 it was worst — that model had no calibration
     entry at all and silently fell back to a default meant for an older tokenizer.
   </p>
   <p>
-    You can re-run the gate yourself: <code>npm run test:tokenizer</code>. It fails the build
-    unless all 5,278 documents reproduce exactly. That matters because a tokenizer fails
-    <em>silently</em> — it returns a plausible number rather than an error — so document-level
-    parity is the only real evidence.
+    You can re-run the gate yourself with <code>npm run test:tokenizer</code>. It fails unless
+    all 5,278 documents reproduce exactly, which matters because a tokenizer fails
+    <em>silently</em>: it returns a plausible number rather than an error. Document-level parity
+    is the only real evidence.
   </p>
 </section>
 
@@ -144,7 +151,7 @@
     Click it for the breakdown.
   </p>
 
-  <div class="grid">
+  <div class="sheet cards">
     <div class="card">
       <span class="tag">Exact count</span>
       <h3>Where the tokens went</h3>
@@ -194,9 +201,9 @@
   <ol class="steps">
     <li>
       <h3>Get the build</h3>
-      <p>Download the latest <code>dist</code> zip from
-        <a href="https://github.com/x1vlcn/claude-context-meter/releases">Releases</a> and unzip it.
-        Or build from source:</p>
+      <p>Download the zip from
+        <a href="https://github.com/x1vlcn/claude-context-meter/releases">Releases</a> and unzip
+        it. Or build from source:</p>
       <pre><code>git clone https://github.com/x1vlcn/claude-context-meter
 cd claude-context-meter
 npm install &amp;&amp; npm run build</code></pre>
@@ -208,21 +215,21 @@ npm install &amp;&amp; npm run build</code></pre>
     </li>
     <li>
       <h3>Load unpacked</h3>
-      <p>Select the <code>dist</code> folder. Open any conversation on claude.ai — the meter
-        appears beside it.</p>
+      <p>Select the unzipped folder (or <code>dist</code> if you built from source). Open any
+        conversation on claude.ai — the meter appears beside it.</p>
     </li>
   </ol>
 
-  <p style="margin-top:30px">
-    <strong>Mobile:</strong> Brave for Android does not support loading extensions from a
-    folder, and the Claude Android app is native, so neither can run this today. Desktop only
-    until the Web Store listing exists.
+  <p style="margin-top:28px">
+    <strong>Mobile:</strong> Brave for Android cannot load extensions from a folder, and the
+    Claude Android app is native, so neither can run this today. Desktop only until the Web
+    Store listing exists.
   </p>
 </section>
 
 <!-- ── How it works ──────────────────────────────────────────────────────── -->
 <section class="wrap sec" id="how">
-  <div class="eyebrow">97 KB · no network calls</div>
+  <div class="eyebrow">97 KB · no external calls</div>
   <h2>How it works</h2>
   <p>
     The extension reads the conversation payload claude.ai already fetches for itself, counts it
@@ -233,24 +240,24 @@ npm install &amp;&amp; npm run build</code></pre>
   <h3 style="margin-top:34px">Where the number comes from</h3>
   <p>Four sources, in strict order of trust. The panel always names the one in use.</p>
 
-  <div class="ladder">
+  <div class="sheet" style="margin-top:20px">
     <div class="rung">
-      <div class="rung-k k-measured">measured<i>ground truth</i></div>
+      <div class="rung-k k-hot">measured<i>ground truth</i></div>
       <p>The server's own <code>input_tokens</code> from the response stream. When this is
          available, nothing is estimated.</p>
     </div>
     <div class="rung">
-      <div class="rung-k k-exact">exact<i>local tokenizer</i></div>
+      <div class="rung-k k-hot">exact<i>local tokenizer</i></div>
       <p>Every message tokenized with the ported Claude tokenizer. Exact per message; the
          conversation's framing overhead is the remaining unknown.</p>
     </div>
     <div class="rung">
-      <div class="rung-k k-approx">cached<i>previous visit</i></div>
+      <div class="rung-k k-warm">cached<i>previous visit</i></div>
       <p>The stored tally for this conversation, shown immediately on load so the meter never
          flashes empty while the payload is fetched.</p>
     </div>
     <div class="rung">
-      <div class="rung-k k-approx">approx<i>fallback</i></div>
+      <div class="rung-k k-cold">approx<i>fallback</i></div>
       <p>A measured characters-per-token ratio, used only in the moment before the vocabulary
          finishes loading, or for a model released after the build. Always labelled.</p>
     </div>
@@ -258,11 +265,11 @@ npm install &amp;&amp; npm run build</code></pre>
 
   <h3 style="margin-top:38px">The tokenizer</h3>
   <p>
-    Claude's tokenizer is not published. It is also not BPE-merge based — it behaves like
+    Claude's tokenizer is not published, and it is not BPE-merge based — it behaves like
     minimum-piece tokenization, so a count is the cheapest tiling of a marked stream over a
-    vocabulary, with a UTF-8 byte floor for characters no piece covers. Word edges, capitalisation
-    and byte fallback are written into that stream as markers before tiling, which is what the
-    hero strip above is showing.
+    vocabulary, with a UTF-8 byte floor for characters no piece covers. Word edges,
+    capitalisation and byte fallback are written into that stream as markers before tiling,
+    which is what the strip at the top of this page is showing.
   </p>
   <p>
     The vocabulary and the tiling rules come from
@@ -285,8 +292,8 @@ npm install &amp;&amp; npm run build</code></pre>
   <div class="caveat">
     <h3>The system prompt is an estimate</h3>
     <p>Claude's base system prompt and always-on tool definitions are not in any payload the
-       browser can see. The default figure is approximately 28,000 tokens and is adjustable in
-       Options — it is the single largest source of remaining error.</p>
+       browser can see. The default is approximately 28,000 tokens and is adjustable in Options.
+       It is the single largest remaining source of error.</p>
   </div>
   <div class="caveat">
     <h3>Project knowledge cannot be measured</h3>
@@ -330,18 +337,20 @@ npm install &amp;&amp; npm run build</code></pre>
 
 <footer class="foot">
   <div class="wrap foot-in">
-    <div>
-      <p>
-        Built by <a href="https://vulcanax.com">VulcanaX</a>. MIT licensed.
-        Tokenizer vocabulary and tiling rules from
-        <a href="https://github.com/sanderland/ctok">sanderland/ctok</a>, also MIT.
-        Not affiliated with Anthropic.
-      </p>
-    </div>
+    <p>
+      Built by <a href="https://vulcanax.com">VulcanaX</a>. MIT licensed. Tokenizer vocabulary
+      and tiling rules from <a href="https://github.com/sanderland/ctok">sanderland/ctok</a>,
+      also MIT. Not affiliated with Anthropic.
+    </p>
     <div class="foot-links">
       <a href="https://github.com/x1vlcn/claude-context-meter">Repository</a>
       <a href="https://github.com/x1vlcn/claude-context-meter/releases">Releases</a>
       <a href="https://github.com/x1vlcn/claude-context-meter/issues">Issues</a>
+    </div>
+    <div class="coals" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span><span></span>
     </div>
   </div>
 </footer>

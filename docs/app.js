@@ -57,7 +57,7 @@
   // Sanity: the tallies in the markup must match the arrays above.
   var check = { 'row-old': OLD.length, 'row-new': NEW.length };
   Object.keys(check).forEach(function (id) {
-    var row = document.getElementById(id).closest('.row');
+    var row = document.getElementById(id).closest('.trow');
     var shown = parseInt(row.querySelector('.tally b').textContent, 10);
     if (shown !== check[id]) {
       console.warn('[docs] token tally out of sync for ' + id +
