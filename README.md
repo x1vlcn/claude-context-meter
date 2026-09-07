@@ -471,10 +471,39 @@ upstream attribution in every file.
 The panel has a **Send feedback** button. It POSTs to a relay URL you set in Options,
 which is expected to forward to Discord or wherever else you want it.
 
-**It deliberately cannot hold a Discord webhook.** A webhook URL shipped inside an
-extension is readable by anyone who installs it, and rotating it would mean shipping a
-new release to every user. Behind a relay you control, the webhook stays server-side
-and can be rate-limited or filtered first.
+Feedback lands in **Discord** — but the extension never holds the webhook. A webhook
+URL shipped inside an extension is readable by anyone who installs it, and rotating it
+would mean shipping a new release to every user. `api/feedback.js` is a Vercel
+serverless function that holds it in an environment variable instead, so it is
+rotatable in seconds and every message is validated before it reaches your channel.
+
+### Deploying the relay
+
+1. **Discord** → Server Settings → Integrations → Webhooks → **New Webhook**, pick the
+   channel, **Copy Webhook URL**.
+2. **Vercel** → Add New → Project → import `x1vlcn/claude-context-meter`. `vercel.json`
+   already sets the output directory to `docs`, so it serves this site *and* the
+   function with no build step.
+3. Project → Settings → **Environment Variables** → `DISCORD_WEBHOOK_URL` = the URL from
+   step 1. Never commit it; the function reads it at runtime.
+4. Extension **Options** → Relay endpoint URL → `https://<deployment>/api/feedback`.
+   Saving requests browser permission for that origin.
+
+What the relay does before anything reaches Discord: rejects any body whose `source`
+isn't this extension, drops empty messages, caps the message at 2,000 characters and
+diagnostics at 20 short fields, sets `allowed_mentions: {parse: []}` so user text can
+never ping `@everyone`, and throttles a single IP to 5 messages a minute.
+
+That throttle is best-effort — serverless instances are recycled, so it stops a naive
+flood but is not a real rate limiter. If the endpoint is ever abused in earnest, move
+the counter to Vercel KV; the shape of the check does not change. Unsetting
+`DISCORD_WEBHOOK_URL` disables the endpoint entirely (503).
+
+Verify the relay logic without deploying or touching Discord:
+
+```bash
+npm run test:relay
+```
 
 The request body is:
 

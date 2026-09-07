@@ -11,6 +11,9 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://x1vlcn.github.io/claude-context-meter/">
 
+<!-- Syne carries the headline, so it is the one face worth preloading; the rest
+     swap in behind metric-matched fallbacks without moving the layout. -->
+<link rel="preload" as="font" type="font/woff2" href="fonts/syne-var.woff2" crossorigin>
 <link rel="stylesheet" href="styles.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%231E1B18'/%3E%3Cpath d='M5 18 L12 6 L19 18' stroke='%23F5F5F7' stroke-width='2.2' fill='none'/%3E%3Cpath d='M8 13.5 h8' stroke='%23FF7A2D' stroke-width='2.2'/%3E%3C/svg%3E">
 <!-- Runs before paint so <html data-theme> is stamped and the page never flashes

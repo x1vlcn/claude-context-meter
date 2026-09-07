@@ -10,7 +10,8 @@
     "build:ctok-data": "python tools/build-ctok-data.py --ctok ../ctok",
     "e2e": "node tools/e2e/server.mjs",
     "icons": "node tools/rasterize-icons.mjs",
-    "icons:check": "node tools/rasterize-icons.mjs --check"
+    "icons:check": "node tools/rasterize-icons.mjs --check",
+    "test:relay": "node tools/verify-feedback-relay.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.21.0"

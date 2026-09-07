@@ -169,9 +169,15 @@
     const used  = num(node.utilization) ?? num(node.used) ?? num(node.usage) ?? null;
     const limit = num(node.limit) ?? num(node.total) ?? num(node.cap) ?? null;
     const resetsAt = node.resets_at ?? node.resetsAt ?? node.reset_at ?? node.expires_at ?? null;
-    // `utilization` is commonly a 0..1 fraction; a paired limit means it is a count.
+    // Two producers, two scales: the /usage endpoint reports `utilization` as a
+    // 0..100 PERCENT (verified live 2026-09-07: five_hour.utilization === 33, with
+    // no paired limit field), while the SSE message_limit reports a 0..1 fraction.
+    // The old `used <= 1 ? used : null` collapsed every endpoint value to null, so
+    // the quota bars silently rendered empty on real claude.ai.
     const fraction = (limit && used != null) ? (used / limit)
-                   : (used != null && used <= 1 ? used : null);
+                   : used == null ? null
+                   : used <= 1   ? used
+                   : used / 100;
     if (used == null && fraction == null) return null;
     return { used, limit, fraction, resetsAt };
   }
