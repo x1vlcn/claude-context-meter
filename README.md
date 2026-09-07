@@ -1,5 +1,7 @@
 # Claude Context Meter
 
+**Docs → [x1vlcn.github.io/claude-context-meter](https://x1vlcn.github.io/claude-context-meter/)**  ·  [Latest release](https://github.com/x1vlcn/claude-context-meter/releases)
+
 A Manifest V3 browser extension that overlays a live context-window meter on **claude.ai** — modeled after Claude Code's `/context` readout.
 
 The badge sits in the **top-center of the app header** (next to the conversation title) and expands into a drill-down breakdown panel on click.
@@ -46,6 +48,22 @@ Verified document-for-document against upstream's recorded `count_tokens` values
 | **Total** | **5,278** | **100%** |
 
 Run it yourself: `npm run test:tokenizer` (needs a clone of ctok next to this repo).
+
+### How wrong was the old path?
+
+Both methods scored against the same ground truth — Anthropic's recorded
+`count_tokens` values. Neither method is the yardstick; the API is.
+
+| Model family | v0.7 median error | v0.7 mean \|err\| | v0.7 within 5% | v0.8 |
+|---|---|---|---|---|
+| Opus 5 · Sonnet 5 | **−31.5%** | 32.7% | 0.0% | **100% exact** |
+| Opus 4.8 · Opus 4.7 | **−10.6%** | 13.4% | 21.6% | **100% exact** |
+| Sonnet 4.6 · Opus 4.6 · Haiku 4.5 | **−18.9%** | 20.1% | 0.8% | **100% exact** |
+
+Every error ran the same direction — v0.7 **under**-counted, reporting more headroom
+than existed. Worst on Opus 5, which had no multiplier entry at all and fell through
+to `default: 1.0`. Combined with the 200k-instead-of-1M window bug, the badge read
+roughly **3.4× too full** on that model.
 
 The old path was measurably 24–144% off depending on model and content type. It is
 gone, and with it the 2.7 MB of bundled OpenAI vocabulary:
@@ -445,6 +463,37 @@ conversation's own framing. Those are the remaining sources of error.
 
 No code was copied from GPL-licensed sources. ctok is MIT and its port retains
 upstream attribution in every file.
+
+---
+
+## Feedback
+
+The panel has a **Send feedback** button. It POSTs to a relay URL you set in Options,
+which is expected to forward to Discord or wherever else you want it.
+
+**It deliberately cannot hold a Discord webhook.** A webhook URL shipped inside an
+extension is readable by anyone who installs it, and rotating it would mean shipping a
+new release to every user. Behind a relay you control, the webhook stays server-side
+and can be rate-limited or filtered first.
+
+The request body is:
+
+```json
+{
+  "source": "claude-context-meter",
+  "kind": "bug" | "idea" | "other",
+  "message": "what the user typed",
+  "diagnostics": { "version": "0.8.1", "model": "claude-opus-5", "window": 1000000,
+                   "pct": 32.4, "tokenizer": "exact", "compaction": "will", "...": "..." }
+}
+```
+
+`diagnostics` is `null` if the user unticks the box, and the panel renders the exact
+object before sending it. It never carries conversation text, titles, ids, or the page
+URL — none of that is needed to reproduce a metering bug.
+
+Saving an endpoint requests browser permission for that origin at that moment; until
+then the extension asks for no network access beyond claude.ai.
 
 ---
 
