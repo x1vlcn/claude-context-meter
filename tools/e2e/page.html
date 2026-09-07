@@ -58,6 +58,27 @@
   </fieldset>
 </div>
 
+<script>
+// Reproduces claude.ai's "type anywhere to focus the composer" behaviour, which is
+// what the feedback textarea has to survive. The guard below is the usual shape:
+// bail out if the user is already in an editable. It is defeated by shadow DOM,
+// because document.activeElement retargets to the HOST element at the shadow
+// boundary — so focus inside our panel reads as "not editable" and gets stolen.
+// ?steal=capture runs the same handler in the capture phase instead of bubble.
+(function () {
+  var mode = new URLSearchParams(location.search).get('steal') || 'bubble';
+  if (mode === 'off') return;
+  window.__stolen = 0;
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (!e.key || e.key.length !== 1) return;
+    var ae = document.activeElement;
+    if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable)) return;
+    var composer = document.querySelector('div.ProseMirror[contenteditable]');
+    if (composer && document.activeElement !== composer) { window.__stolen++; composer.focus(); }
+  }, mode === 'capture');
+})();
+</script>
 <script src="/shim.js"></script>
 <!-- injected.js runs in the MAIN world at document_start on the real site. -->
 <script src="/dist/injected.js"></script>

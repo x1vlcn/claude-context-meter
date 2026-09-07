@@ -1,6 +1,6 @@
 {
   "name": "claude-context-meter",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Live context-window meter for claude.ai with exact Claude token counting",
   "scripts": {
     "build": "node build.js",

@@ -62,6 +62,11 @@ function brandVars() {
 // ── CSS ───────────────────────────────────────────────────────────────────────
 const CSS = `
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Class selectors outrank the UA stylesheet's [hidden] rule, so anything given
+     display: flex/grid/block by a class ignores the attribute — which is why the
+     "Send feedback" button stayed visible underneath the form it had just opened.
+     Restore it once here rather than writing .thing[hidden] for each case. */
+  [hidden] { display: none !important; }
 
   .badge {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', ui-sans-serif, sans-serif;
@@ -1353,6 +1358,46 @@ export class Badge {
     }
   }
 
+  // ── Keyboard containment ───────────────────────────────────────────────────
+  /**
+   * Keep our own keystrokes from reaching claude.ai.
+   *
+   * claude.ai focuses its composer on any keystroke that arrives at the page
+   * without an editable target — the usual "type anywhere to start typing" chat
+   * behaviour. Its guard checks `document.activeElement`, and shadow DOM
+   * RETARGETS at the boundary: with focus on our textarea, the page sees
+   * `<div id="ccm-badge-host">`, which is not editable. So every character typed
+   * into the feedback box was stolen into the chat composer instead.
+   *
+   * The listener is on `window` in the CAPTURE phase because that is the
+   * earliest point in the propagation path — earlier than any handler the page
+   * has on document, in either phase — so the page's handler never runs for
+   * events that started inside this shadow root.
+   *
+   * It stops PROPAGATION only, never the default action, so the character still
+   * lands in the field. Events that did not originate here are untouched, so
+   * typing everywhere else on claude.ai behaves exactly as before.
+   */
+  _containKeyboard() {
+    const shadow = this._shadow;
+    const CONTAINED = [
+      'keydown', 'keypress', 'keyup',
+      'beforeinput', 'input',
+      'paste', 'cut', 'copy',
+      // IME composition, or typing in Japanese/Chinese would still leak.
+      'compositionstart', 'compositionupdate', 'compositionend',
+    ];
+    const startedHere = (e) => {
+      if (typeof e.composedPath !== 'function') return false;
+      return e.composedPath().includes(shadow);
+    };
+    for (const type of CONTAINED) {
+      window.addEventListener(type, (e) => {
+        if (startedHere(e)) e.stopPropagation();
+      }, true);
+    }
+  }
+
   // ── Feedback ───────────────────────────────────────────────────────────────
   _setupFeedback() {
     const s = this._shadow;
@@ -1598,6 +1643,7 @@ export class Badge {
     wire('hdoc-download', () => this._onHandoffDocDownload?.(), 'Saved ✓');
     wire('hdoc-ask',      () => this._onHandoffDocAsk?.(),      'Copied ✓');
     this._setupFeedback();
+    this._containKeyboard();
   }
 
   // ── Handoff buttons ───────────────────────────────────────────────────────
