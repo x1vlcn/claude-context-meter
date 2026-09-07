@@ -1225,16 +1225,21 @@ export class Badge {
     }
 
     // ── Panel ──────────────────────────────────────────────────────────────
-    // System prompt section
-    s.getElementById('p-baseline').textContent = fmtK(baseline);
+    // System prompt section.
+    //
+    // `baseline` from assemble() INCLUDES project instructions, but the panel also
+    // lists Project as its own top-level row. Showing the combined figure here made
+    // the visible rows sum to more than the total — 2.5k of project instructions
+    // appeared in both lines, so anyone checking the arithmetic got the wrong
+    // answer even though the total itself was right. Subtract it: System prompt is
+    // the base prompt alone, Project owns its own tokens, and the rows now add up
+    // to Context used.
+    const baseOnly = Math.max(0, baseline - projectInstructionTokens);
+    s.getElementById('p-baseline').textContent = fmtK(baseOnly);
     const baselineItems = s.getElementById('baseline-items');
     baselineItems.innerHTML = '';
-    baselineItems.appendChild(makeRow('Base system', fmtK(CONFIG.baselineTokens)));
-    if (projectInstructionTokens > 0) {
-      const tag = projectInstructionMeasured ? 'measured' : 'manual';
-      baselineItems.appendChild(makeRow(`Project instructions (${tag})`, fmtK(projectInstructionTokens)));
-    }
-    baselineItems.appendChild(makeNote('Base system prompt is an estimate (~28k).'));
+    baselineItems.appendChild(makeRow('Base system', fmtK(baseOnly)));
+    baselineItems.appendChild(makeNote('Base system prompt is an estimate (~28k). Project instructions are counted under Project.'));
 
     // Tools section
     s.getElementById('p-tools').textContent = fmtK(tools);

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Claude Context Meter",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Live context-window meter for claude.ai \u2014 auto left-center placement, provisional load indicator, composer effort detection, self-contained AX mark, smart auto-collapse on artifact panels, VulcanAX brand skin, session-handoff doc generation.",
   "permissions": [
     "storage"
