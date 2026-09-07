@@ -2,7 +2,13 @@
  * Feedback relay — extension → Discord.
  *
  * Runs as a Vercel serverless function. The extension POSTs here; this forwards
- * to a Discord webhook held in the DISCORD_WEBHOOK_URL environment variable.
+ * to a Discord webhook held in the DISCORD_WEBHOOK_SECRET environment variable.
+ *
+ * That variable is read and NOTHING else is accepted as a fallback — in
+ * particular not DISCORD_WEBHOOK_URL, which is the name the portal project uses
+ * for its own shared webhook. Falling back to it would silently route meter
+ * feedback into the portal's notification channel, which is the exact thing a
+ * dedicated webhook exists to prevent.
  *
  * WHY a relay rather than posting to Discord from the extension: a webhook URL
  * shipped inside a browser extension is public. Anyone who installs it can read
@@ -15,7 +21,8 @@
  *   1. In Discord: Server Settings → Integrations → Webhooks → New Webhook,
  *      choose the channel, Copy Webhook URL.
  *   2. In Vercel: Project → Settings → Environment Variables →
- *      DISCORD_WEBHOOK_URL = <that URL>.  Do not commit it.
+ *      DISCORD_WEBHOOK_SECRET = <that URL>.  Do not commit it. Redeploy after
+ *      saving; env vars are bound at deploy time.
  *   3. In the extension's Options: Relay endpoint URL =
  *      https://<your-deployment>/api/feedback
  */
@@ -68,10 +75,11 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
-  const webhook = process.env.DISCORD_WEBHOOK_URL;
+  const webhook = process.env.DISCORD_WEBHOOK_SECRET;
   if (!webhook) {
     // Fail loudly in the log, vaguely to the caller — the client cannot fix this.
-    console.error('[feedback] DISCORD_WEBHOOK_URL is not set');
+    // The log names the variable so a misconfigured deploy diagnoses itself.
+    console.error('[feedback] DISCORD_WEBHOOK_SECRET is not set');
     return res.status(503).json({ error: 'Feedback is not configured yet.' });
   }
 

@@ -11,7 +11,7 @@
 
 import process from 'node:process';
 
-process.env.DISCORD_WEBHOOK_URL = 'https://discord.test/api/webhooks/mock';
+process.env.DISCORD_WEBHOOK_SECRET = 'https://discord.test/api/webhooks/mock';
 
 const sent = [];
 globalThis.fetch = async (url, init) => {
@@ -103,8 +103,20 @@ check('a flood from one IP is throttled', last.statusCode === 429, `got ${last.s
 const other = await call(VALID, { ip: '5.5.5.5' });
 check('a different IP is unaffected', other.statusCode === 200, `got ${other.statusCode}`);
 
-console.log('\nUnconfigured');
+console.log('\nNo fallback to the portal webhook');
+// The portal project uses DISCORD_WEBHOOK_URL for a webhook carrying its own
+// notifications. If this handler ever grew a fallback to that name, meter feedback
+// would silently land in the portal's channel. Assert that it cannot.
+process.env.DISCORD_WEBHOOK_URL = 'https://discord.test/api/webhooks/PORTAL-SHARED';
+delete process.env.DISCORD_WEBHOOK_SECRET;
+sent.length = 0;
+r = await call(VALID, { ip: '7.7.7.7' });
+check('DISCORD_WEBHOOK_URL is not used as a fallback', r.statusCode === 503, `got ${r.statusCode}`);
+check('nothing reached the portal webhook', sent.length === 0, `sent ${sent.length}`);
 delete process.env.DISCORD_WEBHOOK_URL;
+
+console.log('\nUnconfigured');
+delete process.env.DISCORD_WEBHOOK_SECRET;
 r = await call(VALID, { ip: '6.6.6.6' });
 check('missing webhook returns 503, not a crash', r.statusCode === 503);
 

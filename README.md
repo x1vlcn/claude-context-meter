@@ -484,8 +484,12 @@ rotatable in seconds and every message is validated before it reaches your chann
 2. **Vercel** → Add New → Project → import `x1vlcn/claude-context-meter`. `vercel.json`
    already sets the output directory to `docs`, so it serves this site *and* the
    function with no build step.
-3. Project → Settings → **Environment Variables** → `DISCORD_WEBHOOK_URL` = the URL from
-   step 1. Never commit it; the function reads it at runtime.
+3. Project → Settings → **Environment Variables** → `DISCORD_WEBHOOK_SECRET` = the URL
+   from step 1, then **redeploy** — Vercel binds env vars at deploy time. Never commit it.
+
+   Use a webhook dedicated to this, not one already carrying other notifications. The
+   function reads `DISCORD_WEBHOOK_SECRET` and deliberately does *not* fall back to
+   `DISCORD_WEBHOOK_URL`, so a shared webhook cannot be picked up by accident.
 4. Extension **Options** → Relay endpoint URL → `https://<deployment>/api/feedback`.
    Saving requests browser permission for that origin.
 
@@ -497,7 +501,7 @@ never ping `@everyone`, and throttles a single IP to 5 messages a minute.
 That throttle is best-effort — serverless instances are recycled, so it stops a naive
 flood but is not a real rate limiter. If the endpoint is ever abused in earnest, move
 the counter to Vercel KV; the shape of the check does not change. Unsetting
-`DISCORD_WEBHOOK_URL` disables the endpoint entirely (503).
+`DISCORD_WEBHOOK_SECRET` disables the endpoint entirely (503).
 
 Verify the relay logic without deploying or touching Discord:
 
