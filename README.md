@@ -1,6 +1,6 @@
 # Claude Context Meter
 
-**Docs → [x1vlcn.github.io/claude-context-meter](https://x1vlcn.github.io/claude-context-meter/)**  ·  [Latest release](https://github.com/x1vlcn/claude-context-meter/releases)
+**Docs → [claude-context-meter.vercel.app](https://claude-context-meter.vercel.app/)**  ·  [Latest release](https://github.com/x1vlcn/claude-context-meter/releases)
 
 A Manifest V3 browser extension that overlays a live context-window meter on **claude.ai** — modeled after Claude Code's `/context` readout.
 
