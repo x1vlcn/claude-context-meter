@@ -1,0 +1,14 @@
+node_modules/
+
+# Build output. Shipped as a zip on the Releases page instead of committed —
+# dist/ctok/*.json would duplicate src/ctok/data/ byte for byte.
+dist/
+*.zip
+
+# Local scratch
+.harness/
+.DS_Store
+Thumbs.db
+
+# Local editor/agent settings
+.claude/

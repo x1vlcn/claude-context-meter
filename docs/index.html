@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Context Meter — exact context tracking for claude.ai</title>
+<meta name="description" content="A browser extension that shows how full your Claude conversation is, counted with a port of Claude's own tokenizer. Verified exact on 5,278 reference documents.">
+<meta name="color-scheme" content="dark">
+
+<meta property="og:title" content="Claude Context Meter">
+<meta property="og:description" content="Exact context tracking for claude.ai, counted with Claude's own tokenizer.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%230A0A0B'/%3E%3Cpath d='M6 17 L12 7 L18 17' stroke='%23F5F5F7' stroke-width='2.2' fill='none'/%3E%3Cpath d='M8.5 13.5 h7' stroke='%23FF7A2D' stroke-width='2.2'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#top">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 18 L12 5 L20 18" stroke="#F5F5F7" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <path d="M7.5 13 h9" stroke="#FF7A2D" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      claude-context-meter
+    </a>
+    <div class="nav-links">
+      <a href="#evidence" class="nav-hide">Accuracy</a>
+      <a href="#shows" class="nav-hide">What it shows</a>
+      <a href="#install">Install</a>
+      <a href="#how" class="nav-hide">How it works</a>
+      <a href="https://github.com/x1vlcn/claude-context-meter">GitHub&nbsp;↗</a>
+    </div>
+  </div>
+</nav>
+
+<main id="top">
+
+<!-- ── Hero ──────────────────────────────────────────────────────────────── -->
+<section class="wrap hero">
+  <h1>Claude won't tell you how full the conversation is. <em>This does.</em></h1>
+  <p class="lede">
+    A browser extension that meters your context window on claude.ai — counted with a
+    port of Claude's own tokenizer, not an approximation of it.
+  </p>
+
+  <div class="cta">
+    <a class="btn btn-primary" href="#install">Install</a>
+    <a class="btn" href="https://github.com/x1vlcn/claude-context-meter">Source on GitHub</a>
+  </div>
+
+  <!-- Signature: the same sentence, tiled by both tokenizers, real output. -->
+  <div class="tiles">
+    <div class="tiles-cap">
+      <b>One sentence, two tokenizers.</b>
+      <span>Actual tilings — not an illustration.</span>
+    </div>
+
+    <div class="strip">
+      <div class="row is-old">
+        <div class="row-label"><b>o200k_base</b>what most tools count with</div>
+        <div class="pieces" id="row-old"></div>
+        <div class="tally"><b>11</b><span>pieces</span></div>
+      </div>
+      <div class="row is-new">
+        <div class="row-label"><b>Claude</b>what you're actually billed</div>
+        <div class="pieces" id="row-new"></div>
+        <div class="tally"><b>17</b><span>pieces</span></div>
+      </div>
+      <div class="strip-foot">
+        Claude splits the same 43 characters into <b>55% more pieces</b>, and marks word
+        edges (<code>bow</code>/<code>eow</code>) and capitalisation (<code>shift</code>)
+        as tokens of their own. Count with the wrong tokenizer and you are told you have
+        room you do not have.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Evidence ──────────────────────────────────────────────────────────── -->
+<section class="wrap sec" id="evidence">
+  <div class="eyebrow">5,278 reference documents</div>
+  <h2>Measured, not claimed</h2>
+  <p>
+    Both counting methods below were scored against the same ground truth: Anthropic's own
+    recorded <code>count_tokens</code> values, across 501 natural languages and 22
+    programming languages. Neither method is the yardstick — the API is.
+  </p>
+
+  <div class="tbl-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Model family</th>
+          <th>Old method<br>median error</th>
+          <th>Old method<br>mean |error|</th>
+          <th>Old method<br>within 5%</th>
+          <th>This extension</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Opus 5 · Sonnet 5</td>
+          <td class="bad">−31.5%</td><td class="bad">32.7%</td><td class="bad">0.0%</td>
+          <td class="good">100% exact</td>
+        </tr>
+        <tr>
+          <td>Opus 4.8 · Opus 4.7</td>
+          <td class="bad">−10.6%</td><td class="bad">13.4%</td><td class="bad">21.6%</td>
+          <td class="good">100% exact</td>
+        </tr>
+        <tr>
+          <td>Sonnet 4.6 · Opus 4.6 · Haiku 4.5</td>
+          <td class="bad">−18.9%</td><td class="bad">20.1%</td><td class="bad">0.8%</td>
+          <td class="good">100% exact</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="margin-top:22px">
+    Every error ran the same direction: the old approach <strong>under-counted</strong>, so it
+    reported more headroom than existed. On Opus 5 it was worst — that model had no calibration
+    entry at all and silently fell back to a default meant for an older tokenizer.
+  </p>
+  <p>
+    You can re-run the gate yourself: <code>npm run test:tokenizer</code>. It fails the build
+    unless all 5,278 documents reproduce exactly. That matters because a tokenizer fails
+    <em>silently</em> — it returns a plausible number rather than an error — so document-level
+    parity is the only real evidence.
+  </p>
+</section>
+
+<!-- ── What it shows ─────────────────────────────────────────────────────── -->
+<section class="wrap sec" id="shows">
+  <div class="eyebrow">In the panel</div>
+  <h2>What it shows you</h2>
+  <p>
+    A pill next to your conversation with the model, effort level, and how full the window is.
+    Click it for the breakdown.
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <span class="tag">Exact count</span>
+      <h3>Where the tokens went</h3>
+      <p>
+        System prompt, tool definitions, messages, attachments, artifacts, free space — counted
+        from the full conversation payload, so turns you have scrolled past and artifacts you
+        have closed are still counted.
+      </p>
+    </div>
+    <div class="card">
+      <span class="tag">Hard-limit warning</span>
+      <h3>Whether this chat can recover</h3>
+      <p>
+        Claude only auto-summarises a full conversation when code execution is enabled. With it
+        off there is no summariser and the window is a wall. The panel tells you which one you
+        are heading for — nothing else does.
+      </p>
+    </div>
+    <div class="card">
+      <span class="tag">Handoff</span>
+      <h3>A clean exit before the wall</h3>
+      <p>
+        At 80% it offers to generate a handoff you can paste into a fresh conversation, written
+        while the model can still see the full, uncompacted history.
+      </p>
+    </div>
+    <div class="card">
+      <span class="tag">Plan usage</span>
+      <h3>The other way you run out</h3>
+      <p>
+        Session and weekly allowance, read unrounded — finer than the figures the usage page
+        shows you.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Install ───────────────────────────────────────────────────────────── -->
+<section class="wrap sec" id="install">
+  <div class="eyebrow">Chrome · Brave · Edge</div>
+  <h2>Install</h2>
+  <p>
+    Not on the Chrome Web Store yet, so it loads unpacked. Chromium browsers only — Firefox
+    packaging is not done.
+  </p>
+
+  <ol class="steps">
+    <li>
+      <h3>Get the build</h3>
+      <p>Download the latest <code>dist</code> zip from
+        <a href="https://github.com/x1vlcn/claude-context-meter/releases">Releases</a> and unzip it.
+        Or build from source:</p>
+      <pre><code>git clone https://github.com/x1vlcn/claude-context-meter
+cd claude-context-meter
+npm install &amp;&amp; npm run build</code></pre>
+    </li>
+    <li>
+      <h3>Open your browser's extensions page</h3>
+      <p><code>brave://extensions</code>, <code>chrome://extensions</code>, or
+        <code>edge://extensions</code>. Turn on <strong>Developer mode</strong>.</p>
+    </li>
+    <li>
+      <h3>Load unpacked</h3>
+      <p>Select the <code>dist</code> folder. Open any conversation on claude.ai — the meter
+        appears beside it.</p>
+    </li>
+  </ol>
+
+  <p style="margin-top:30px">
+    <strong>Mobile:</strong> Brave for Android does not support loading extensions from a
+    folder, and the Claude Android app is native, so neither can run this today. Desktop only
+    until the Web Store listing exists.
+  </p>
+</section>
+
+<!-- ── How it works ──────────────────────────────────────────────────────── -->
+<section class="wrap sec" id="how">
+  <div class="eyebrow">97 KB · no network calls</div>
+  <h2>How it works</h2>
+  <p>
+    The extension reads the conversation payload claude.ai already fetches for itself, counts it
+    locally, and renders the result. Nothing is uploaded, there are no analytics, and it talks to
+    no server other than claude.ai.
+  </p>
+
+  <h3 style="margin-top:34px">Where the number comes from</h3>
+  <p>Four sources, in strict order of trust. The panel always names the one in use.</p>
+
+  <div class="ladder">
+    <div class="rung">
+      <div class="rung-k k-measured">measured<i>ground truth</i></div>
+      <p>The server's own <code>input_tokens</code> from the response stream. When this is
+         available, nothing is estimated.</p>
+    </div>
+    <div class="rung">
+      <div class="rung-k k-exact">exact<i>local tokenizer</i></div>
+      <p>Every message tokenized with the ported Claude tokenizer. Exact per message; the
+         conversation's framing overhead is the remaining unknown.</p>
+    </div>
+    <div class="rung">
+      <div class="rung-k k-approx">cached<i>previous visit</i></div>
+      <p>The stored tally for this conversation, shown immediately on load so the meter never
+         flashes empty while the payload is fetched.</p>
+    </div>
+    <div class="rung">
+      <div class="rung-k k-approx">approx<i>fallback</i></div>
+      <p>A measured characters-per-token ratio, used only in the moment before the vocabulary
+         finishes loading, or for a model released after the build. Always labelled.</p>
+    </div>
+  </div>
+
+  <h3 style="margin-top:38px">The tokenizer</h3>
+  <p>
+    Claude's tokenizer is not published. It is also not BPE-merge based — it behaves like
+    minimum-piece tokenization, so a count is the cheapest tiling of a marked stream over a
+    vocabulary, with a UTF-8 byte floor for characters no piece covers. Word edges, capitalisation
+    and byte fallback are written into that stream as markers before tiling, which is what the
+    hero strip above is showing.
+  </p>
+  <p>
+    The vocabulary and the tiling rules come from
+    <a href="https://github.com/sanderland/ctok">sanderland/ctok</a>, Sander Land's
+    reconstruction of it. This project ports that to JavaScript and ships the vocabulary as data
+    fetched on demand — 205 KB for current models — rather than bundling a 2.7 MB foreign
+    tokenizer that was wrong anyway.
+  </p>
+</section>
+
+<!-- ── Limits ────────────────────────────────────────────────────────────── -->
+<section class="wrap sec" id="limits">
+  <div class="eyebrow">What it can't do</div>
+  <h2>Limits worth knowing</h2>
+  <p>
+    Exact tokenization fixed the part that could be fixed. These are the parts that remain
+    estimates, and the panel labels them rather than folding them in silently.
+  </p>
+
+  <div class="caveat">
+    <h3>The system prompt is an estimate</h3>
+    <p>Claude's base system prompt and always-on tool definitions are not in any payload the
+       browser can see. The default figure is approximately 28,000 tokens and is adjustable in
+       Options — it is the single largest source of remaining error.</p>
+  </div>
+  <div class="caveat">
+    <h3>Project knowledge cannot be measured</h3>
+    <p>Project documents are retrieved per turn by relevance, and the payload does not say which
+       chunks were used. It is shown as a separate unmeasured line rather than guessed at.</p>
+  </div>
+  <div class="caveat">
+    <h3>Images are approximated</h3>
+    <p>Image cost depends on dimensions the payload does not carry, so a flat per-image estimate
+       is applied and marked approximate.</p>
+  </div>
+  <div class="caveat">
+    <h3>Conversation framing is not separately verified</h3>
+    <p>The upstream tokenizer is validated on single messages. Per-message content is exact; the
+       overhead of assembling many turns into one request is not independently confirmed, which
+       is why a <code>measured</code> reading always outranks a local count.</p>
+  </div>
+</section>
+
+<!-- ── Feedback ──────────────────────────────────────────────────────────── -->
+<section class="wrap sec" id="feedback">
+  <div class="eyebrow">Send feedback</div>
+  <h2>Tell us when it's wrong</h2>
+  <p>
+    The panel has a feedback button. It sends what you type, plus — only if you leave the box
+    ticked — meter diagnostics: version, model, window size, percentage, tokenizer mode,
+    viewport. The panel shows you the exact payload before it goes.
+  </p>
+  <p>
+    It never sends conversation text, titles, ids, or the page URL. None of that is needed to
+    reproduce a metering bug, and the extension asks for no network permission beyond claude.ai
+    until a feedback endpoint is configured.
+  </p>
+  <p>
+    Bugs and feature requests are also welcome as
+    <a href="https://github.com/x1vlcn/claude-context-meter/issues">GitHub issues</a>.
+  </p>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div>
+      <p>
+        Built by <a href="https://vulcanax.com">VulcanaX</a>. MIT licensed.
+        Tokenizer vocabulary and tiling rules from
+        <a href="https://github.com/sanderland/ctok">sanderland/ctok</a>, also MIT.
+        Not affiliated with Anthropic.
+      </p>
+    </div>
+    <div class="foot-links">
+      <a href="https://github.com/x1vlcn/claude-context-meter">Repository</a>
+      <a href="https://github.com/x1vlcn/claude-context-meter/releases">Releases</a>
+      <a href="https://github.com/x1vlcn/claude-context-meter/issues">Issues</a>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "claude-context-meter",
+  "version": "0.8.1",
+  "description": "Live context-window meter for claude.ai with exact Claude token counting",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js --watch",
+    "test": "node tools/verify-integration.mjs",
+    "test:tokenizer": "node tools/verify-ctok-parity.mjs --ctok ../ctok",
+    "build:ctok-data": "python tools/build-ctok-data.py --ctok ../ctok",
+    "e2e": "node tools/e2e/server.mjs",
+    "icons": "node tools/rasterize-icons.mjs",
+    "icons:check": "node tools/rasterize-icons.mjs --check"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.0"
+  },
+  "type": "module",
+  "license": "MIT"
+}

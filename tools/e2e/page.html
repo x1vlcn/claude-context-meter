@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Quarterly ledger reconciliation - Mock Claude</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; background:#1f1e1d; color:#f5f4f2;
+         font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  header { display:flex; align-items:center; gap:12px; height:52px; padding:0 16px;
+           border-bottom:1px solid rgba(255,255,255,.08); position:sticky; top:0;
+           background:#1f1e1d; z-index:50; }
+  .sidebar { position:fixed; left:0; top:52px; bottom:0; width:260px;
+             border-right:1px solid rgba(255,255,255,.08); }
+  main { margin-left:260px; max-width:740px; padding:24px 32px 200px; }
+  .turn { margin-bottom:22px; line-height:1.6; font-size:14px; }
+  [data-testid="human-turn"] { color:#cfcbc4; }
+  [data-testid="ai-turn"]    { color:#f5f4f2; }
+  .composer { position:fixed; left:260px; right:0; bottom:0; padding:14px 32px 22px;
+              background:linear-gradient(transparent,#1f1e1d 40%); }
+  fieldset { border:1px solid rgba(255,255,255,.14); border-radius:12px;
+             padding:10px 12px; margin:0; }
+  .ProseMirror { min-height:44px; outline:none; font-size:14px; }
+  .toolbar { display:flex; gap:8px; margin-top:8px; align-items:center; }
+  button { background:#2c2b29; color:#e8e6e3; border:1px solid rgba(255,255,255,.12);
+           border-radius:8px; padding:4px 10px; font-size:12px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>
+  <button data-testid="model-selector-dropdown">Claude Opus 5</button>
+  <h1 data-testid="conversation-title" style="font-size:14px;font-weight:500;margin:0">
+    Quarterly ledger reconciliation
+  </h1>
+  <button data-testid="chat-menu-trigger" style="margin-left:auto">&#8942;</button>
+</header>
+
+<div class="sidebar"></div>
+
+<main>
+  <!-- A handful of rendered turns. The real conversation is far longer and mostly
+       virtualized, which is the entire reason the extension counts from the tree
+       payload rather than the DOM - this markup deliberately under-represents it. -->
+  <div class="turn" data-testid="human-turn">Can you reconcile the ledger entries for Q3?</div>
+  <div class="turn" data-testid="ai-turn">Yes - walking every transaction and grouping by account.</div>
+  <div class="turn" data-testid="human-turn">What about the paired journals?</div>
+  <div class="turn" data-testid="ai-turn">Those net to zero unless an entry is orphaned.</div>
+</main>
+
+<div class="composer">
+  <fieldset data-testid="composer">
+    <div class="ProseMirror" contenteditable="true" data-placeholder="Reply to Claude..."></div>
+    <div class="toolbar">
+      <button data-testid="effort-selector" aria-label="Reasoning effort: Extra High">Extra High</button>
+      <button aria-label="Send message" style="margin-left:auto">Send</button>
+    </div>
+  </fieldset>
+</div>
+
+<script src="/shim.js"></script>
+<!-- injected.js runs in the MAIN world at document_start on the real site. -->
+<script src="/dist/injected.js"></script>
+<script>
+  // Prime the org id exactly as the real app does: the first request that passes
+  // through the patched fetch is what injected.js scrapes the uuid from.
+  fetch('/api/organizations/11111111-2222-3333-4444-555555555555/bootstrap')
+    .catch(() => {});
+</script>
+<!-- content.js runs at document_idle. -->
+<script defer src="/dist/content.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="24" fill="#0A0A0B"/>
+  <path d="M22 90 A42 42 0 0 1 106 90" stroke="#FF7A2D" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <line x1="64" y1="90" x2="64" y2="42" stroke="#FF7A2D" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="64" cy="90" r="7" fill="#FF7A2D"/>
+  <!-- Progress bar -->
+  <rect x="22" y="104" width="84" height="7" rx="3.5" fill="rgba(255,255,255,0.08)"/>
+  <rect x="22" y="104" width="38" height="7" rx="3.5" fill="#FF7A2D"/>
+  <!-- Tick marks -->
+  <line x1="43" y1="88" x2="43" y2="94" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="64" y1="87" x2="64" y2="94" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+  <line x1="85" y1="88" x2="85" y2="94" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

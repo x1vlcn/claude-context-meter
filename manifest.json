@@ -1,0 +1,72 @@
+{
+  "manifest_version": 3,
+  "name": "Claude Context Meter",
+  "version": "0.8.1",
+  "description": "Live context-window meter for claude.ai \u2014 auto left-center placement, provisional load indicator, composer effort detection, self-contained AX mark, smart auto-collapse on artifact panels, VulcanAX brand skin, session-handoff doc generation.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://claude.ai/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://claude.ai/*"
+      ],
+      "js": [
+        "injected.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://claude.ai/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "injected.js"
+      ],
+      "matches": [
+        "https://claude.ai/*"
+      ],
+      "use_dynamic_url": true
+    },
+    {
+      "resources": [
+        "ctok/*.json"
+      ],
+      "matches": [
+        "https://claude.ai/*"
+      ]
+    }
+  ],
+  "options_page": "options.html",
+  "action": {
+    "default_title": "Claude Context Meter",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "optional_host_permissions": [
+    "https://*/*"
+  ]
+}
